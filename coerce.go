@@ -10,6 +10,42 @@ import (
 	"time"
 )
 
+type StrSlice []string
+
+// Set method for StringSlice
+func (s *StrSlice) Set(value string) error {
+	*s = append(*s, strings.Split(value, ",")...)
+	return nil
+}
+
+// String method for StringSlice
+func (s *StrSlice) String() string {
+	return strings.Join(*s, ",")
+}
+
+func NewStrSliceVar(val []string, p *[]string) *StrSlice {
+	*p = val
+	return (*StrSlice)(p)
+}
+
+type FsWrapper struct {
+	fs *flag.FlagSet
+}
+
+func (fsw *FsWrapper) Var(value flag.Value, name string, usage string) {
+	fsw.fs.Var(value, name, usage)
+}
+
+func (f *FsWrapper) StrSliceVar(p *[]string, name string, value []string, usage string) {
+	f.Var(NewStrSliceVar(value, p), name, usage)
+}
+
+func (f *FsWrapper) StrSlice(name string, value []string, usage string) *[]string {
+	p := new([]string)
+	f.StrSliceVar(p, name, value, usage)
+	return p
+}
+
 func coerceBool(v interface{}) (bool, error) {
 	switch v.(type) {
 	case bool:
@@ -158,7 +194,7 @@ func coerceString(v interface{}) (string, error) {
 	switch vv := v.(type) {
 	case string:
 		return vv, nil
-	case interface{String()string}:
+	case interface{ String() string }:
 		return vv.String(), nil
 	}
 	return fmt.Sprintf("%s", v), nil
@@ -279,7 +315,9 @@ func _coerce(v interface{}, opt interface{}, arg string, fs *flag.FlagSet, name 
 			return nil, err
 		}
 		if fs != nil {
-			return nil, fmt.Errorf("type not support []string")
+			fsw := &FsWrapper{}
+			fsw.fs = fs
+			fsw.StrSlice(name, cv, "")
 		}
 		return cv, nil
 	case []float64:
@@ -300,7 +338,7 @@ func _coerce(v interface{}, opt interface{}, arg string, fs *flag.FlagSet, name 
 			return nil, fmt.Errorf("type not support []int64")
 		}
 		return cv, nil
-	case interface{String()string}:
+	case interface{ String() string }:
 		s, err := coerceString(v)
 		if err != nil {
 			return nil, err
