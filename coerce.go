@@ -14,7 +14,7 @@ type StrSlice []string
 
 // Set method for StringSlice
 func (s *StrSlice) Set(value string) error {
-	*s = append(*s, strings.Split(value, ",")...)
+	*s = strings.Split(value, ",")
 	return nil
 }
 
