@@ -1,4 +1,4 @@
-module github.com/timestee/goconf
+module github.com/zhao-jin/goconf
 
 go 1.12
 
