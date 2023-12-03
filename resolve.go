@@ -57,13 +57,16 @@ func innerResolve(options interface{}, flagSet *flag.FlagSet, cfg map[string]int
 		flagName := field.Tag.Get("flag")
 		cfgName := field.Tag.Get("cfg")
 		defaultVal := field.Tag.Get("default")
+		snakeFlg := field.Tag.Get("case")
 
-		if flagName == "" {
-			flagName = snakeCase(field.Name)
-		}
+		if snakeFlg != "" {
+			if flagName == "" {
+				flagName = snakeCase(field.Name)
+			}
 
-		if cfgName == "" {
-			cfgName = strings.Replace(flagName, "-", "_", -1)
+			if cfgName == "" {
+				cfgName = strings.Replace(flagName, "-", "_", -1)
+			}
 		}
 
 		if autoSet {
@@ -76,7 +79,7 @@ func innerResolve(options interface{}, flagSet *flag.FlagSet, cfg map[string]int
 				if err := coerceAutoSet(v, val.FieldByName(field.Name).Interface(), flagSet, flagName); err != nil {
 					Log(fmt.Sprintf("auto flag fail, name: %s val: %v err: %s", flagName, v, err.Error()))
 				} else {
-					Log(fmt.Sprintf("auto flag succ, name: %s val: %v", flagName, v))
+					// Log(fmt.Sprintf("auto flag succ, name: %s val: %v", flagName, v))
 				}
 			}
 		} else {
@@ -99,10 +102,10 @@ func innerResolve(options interface{}, flagSet *flag.FlagSet, cfg map[string]int
 				Log(fmt.Sprintf("coerce fail: %v for %s (%+v) - %s", v, field.Name, fieldVal, err))
 			}
 			if coerced != nil {
-				func(){
+				func() {
 					defer func() {
 						if reason := recover(); reason != nil {
-							switch value :=coerced.(type) {
+							switch value := coerced.(type) {
 							case string:
 								fieldVal.SetString(value)
 							default:

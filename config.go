@@ -15,7 +15,7 @@ var (
 	globalLogger = func(s string) { log.Print(s) }
 )
 
-//SetGlobalLogger set the global logger func, if nil, lib will keep silent
+// SetGlobalLogger set the global logger func, if nil, lib will keep silent
 func SetGlobalLogger(lf func(string)) {
 	globalLogger = lf
 }
@@ -89,11 +89,11 @@ func (c *Config) resolve(opts interface{}, files []string) error {
 		}
 	}
 
-	c.log(fmt.Sprintf("file:  %v", files))
+	// c.log(fmt.Sprintf("file:  %v", files))
 	errs := errArray{ErrorFormat: errArrayDotFormatFunc}
 	if len(files) > 0 {
 		if err := c.fileLoader.Load(files); err != nil {
-			c.log(fmt.Sprintf("Error with %s", err.Error()))
+			c.log(fmt.Sprintf("Load [%s] failed, use defaults", err.Error()))
 			errs.Push(err)
 		}
 	}
@@ -102,7 +102,7 @@ func (c *Config) resolve(opts interface{}, files []string) error {
 	if b, err := json.MarshalIndent(opts, "", "   "); err != nil {
 		errs.Push(err)
 	} else {
-		c.log(fmt.Sprintf("Contents:\n%v", string(b)))
+		c.log(fmt.Sprintf("Configurations:\n%v", string(b)))
 	}
 
 	if errs.Err() != nil {
