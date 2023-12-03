@@ -57,16 +57,13 @@ func innerResolve(options interface{}, flagSet *flag.FlagSet, cfg map[string]int
 		flagName := field.Tag.Get("flag")
 		cfgName := field.Tag.Get("cfg")
 		defaultVal := field.Tag.Get("default")
-		snakeFlg := field.Tag.Get("case")
 
-		if snakeFlg != "" {
-			if flagName == "" {
-				flagName = snakeCase(field.Name)
-			}
+		if flagName == "" {
+			flagName = snakeCase(field.Name)
+		}
 
-			if cfgName == "" {
-				cfgName = strings.Replace(flagName, "-", "_", -1)
-			}
+		if cfgName == "" {
+			cfgName = strings.Replace(flagName, "-", "_", -1)
 		}
 
 		if autoSet {
